@@ -36,8 +36,8 @@ export default function RootLayout() {
 
     return (
         <Stack >
-            <Stack.Screen name="index" options={{ headerShown: false, animation: "slide_from_left" }} />
-            <Stack.Screen name="audio" options={{ headerShown: false, animation: "slide_from_left" }} />
+            <Stack.Screen name="index" options={{ headerShown: false, animation: "slide_from_right" }} />
+            <Stack.Screen name="audio" options={{ headerShown: false, animation: "fade_from_bottom" }} />
         </Stack>
     )
 }
