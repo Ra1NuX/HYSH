@@ -27,7 +27,6 @@ export default function AudioPage() {
 			audio?.playAsync();
 		} else {
 			audio?.pauseAsync();
-
 		}
 	}, [play]);
 
@@ -58,14 +57,13 @@ export default function AudioPage() {
 			setAudio(newAudio);
 			
 			await newAudio.loadAsync({ uri: randomAudioAsset.uri });
+			newAudio.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
 			await newAudio.playAsync();
-			
-			newAudio.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate)
-			
+		
 			setTimeout(() => {
-				setPlay(false)
+				newAudio.pauseAsync();
 				setAudioAsset(randomAudioAsset);
-			}, 2000)
+			}, dataPlaybackInfo?.durationMillis! * 0.1)
 			
 		} catch (error) {
 			console.log('Error playing random audio:', error);
@@ -103,10 +101,10 @@ export default function AudioPage() {
 						<Ionicons name={play ? "play" : "pause"} size={60} color={color as string} onPress={handleAudioPlayback} /> 
 					</View>
 				</TouchableHighlight>}
-				<View className='h-1 bg-white m-2 rounded-full'>
+				{ dataPlaybackInfo && <View className='h-1 bg-white m-2 rounded-full'>
 					<View className='h-full' style={{backgroundColor: `${color}5f`, width: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%`}}/>
 					<View className='absolute h-3 aspect-square rounded-full bg-white -top-1 -left-1' style={{left: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%` }}/> 
-				</View> 
+				</View> }
 			</View>
 		</SafeAreaView>
 	)
