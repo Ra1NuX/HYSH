@@ -30,6 +30,14 @@ export default function AudioPage() {
 		}
 	}, [play]);
 
+	useEffect(() => {
+		if(dataPlaybackInfo?.durationMillis) {
+			setTimeout(() => {
+				audio?.pauseAsync();
+			}, dataPlaybackInfo.durationMillis * 0.1)
+		}
+	}, [dataPlaybackInfo?.durationMillis])
+
 	const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
 		if (!status.isLoaded) {
 			if (status.error) {
@@ -43,8 +51,7 @@ export default function AudioPage() {
 			  positionMillis: status.positionMillis,
 			})
 		}
-	  }
-	
+	}
 
 	async function playRandomAudio() {
 		try {
@@ -57,14 +64,12 @@ export default function AudioPage() {
 			setAudio(newAudio);
 			
 			await newAudio.loadAsync({ uri: randomAudioAsset.uri });
-			newAudio.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+			newAudio.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate)
 			await newAudio.playAsync();
-		
-			setTimeout(() => {
-				newAudio.pauseAsync();
-				setAudioAsset(randomAudioAsset);
-			}, dataPlaybackInfo?.durationMillis! * 0.1)
 			
+			console.log({dataPlaybackInfo})
+			setAudioAsset(randomAudioAsset);
+
 		} catch (error) {
 			console.log('Error playing random audio:', error);
 		}
@@ -77,7 +82,6 @@ export default function AudioPage() {
 			await audio?.playAsync();
 		} else {
 			await audio?.pauseAsync();
-
 		}
 	}
 
@@ -95,12 +99,15 @@ export default function AudioPage() {
 						Estoy preparado!
 					</Text>
 				</Pressable> }
-
+				
+				{/* TODO: Cambiar este boton por 2 botones de selección de accion (play y abort) */}
 				{audioAsset && <TouchableHighlight >
 					<View className='bg-white shadow-xl m-2 rounded-xl flex justify-center items-center pl-[3px] aspect-square self-center'>
 						<Ionicons name={play ? "play" : "pause"} size={60} color={color as string} onPress={handleAudioPlayback} /> 
 					</View>
 				</TouchableHighlight>}
+
+
 				{ dataPlaybackInfo && <View className='h-1 bg-white m-2 rounded-full'>
 					<View className='h-full' style={{backgroundColor: `${color}5f`, width: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%`}}/>
 					<View className='absolute h-3 aspect-square rounded-full bg-white -top-1 -left-1' style={{left: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%` }}/> 
