@@ -25,8 +25,10 @@ export default function AudioPage() {
 	useEffect(() => {
 		if(!play) {
 			audio?.playAsync();
+			setPlay(true)
 		} else {
 			audio?.pauseAsync();
+			setPlay(false)
 		}
 	}, [play]);
 
@@ -58,8 +60,6 @@ export default function AudioPage() {
 			const randomIndex = Math.floor(Math.random() * WhatsappAudios.size);
 			const randomAudioAsset = Array.from(WhatsappAudios)[randomIndex];
 			
-			console.log({randomAudioAsset})
-
 			const newAudio = new Audio.Sound();
 			setAudio(newAudio);
 			
@@ -108,7 +108,7 @@ export default function AudioPage() {
 				</TouchableHighlight>}
 
 
-				{ dataPlaybackInfo && <View className='h-1 bg-white m-2 rounded-full'>
+				{dataPlaybackInfo && <View className='h-1 bg-white m-2 rounded-full'>
 					<View className='h-full' style={{backgroundColor: `${color}5f`, width: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%`}}/>
 					<View className='absolute h-3 aspect-square rounded-full bg-white -top-1 -left-1' style={{left: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%` }}/> 
 				</View> }
