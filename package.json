@@ -47,7 +47,8 @@
     "styled-components": "^5.3.8",
     "expo-file-system": "~15.2.2",
     "expo-av": "~13.2.1",
-    "@expo/vector-icons": "^13.0.0"
+    "@expo/vector-icons": "^13.0.0",
+    "expo-media-library": "~15.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
