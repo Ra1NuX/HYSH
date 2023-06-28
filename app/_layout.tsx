@@ -1,9 +1,11 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AssetsContext } from '../contexts/AssetsContext';
+import { Asset } from 'expo-media-library';
 
 export {
     // Catch any errors thrown by the Layout component.
@@ -34,10 +36,14 @@ export default function RootLayout() {
     //   );
     // }
 
+    const [assets, setAssets] = useState<Asset[]>([])
+
     return (
-        <Stack >
-            <Stack.Screen name="index" options={{ headerShown: false, animation: "slide_from_right" }} />
-            <Stack.Screen name="audio" options={{ headerShown: false, animation: "fade_from_bottom" }} />
-        </Stack>
+        <AssetsContext.Provider value={[assets, setAssets]} >
+            <Stack >
+                <Stack.Screen name="index" options={{ headerShown: false, animation: "slide_from_right" }} />
+                <Stack.Screen name="audio" options={{ headerShown: false, animation: "fade_from_bottom" }} />
+            </Stack>
+        </AssetsContext.Provider>
     )
 }

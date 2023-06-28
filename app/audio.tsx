@@ -3,34 +3,44 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as MediaLibrary from 'expo-media-library'
 import { AVPlaybackStatus, Audio } from 'expo-av'
-import { useEffect, useState } from 'react';
-import { WhatsappAudios, getWhatsAppFolderPath } from '../utils/getWhatsAppAudioPath';
+import { useContext, useEffect, useState } from 'react';
+import { getAssetsFromAlbum } from '../utils/getAssetsFromAlbum';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
+import { AssetsContext } from '../contexts/AssetsContext';
+import { AudioPlayer } from '../components/shared/AudioPlayer';
 
 
 export default function AudioPage() {
 
-	const {color} = useLocalSearchParams();
+	const context = useContext(AssetsContext);
 
+	if(!context) return; 
+
+	const [assets, setAssets] = context; 
+
+	const {color} = useLocalSearchParams();
 	const [play, setPlay] = useState(false);
 	const [audio, setAudio] = useState<Audio.Sound | null>(null);
 	const [audioAsset, setAudioAsset] =  useState<MediaLibrary.Asset>();
 	const [dataPlaybackInfo, setDataPlaybackInfo] = useState<{isBuffering: boolean, durationMillis: number|undefined, positionMillis: number}>()
 
 	useEffect(() => {
-		getWhatsAppFolderPath().catch(console.log)
+		getAssetsFromAlbum('WhatsApp Audio', 'audio')
+		.then((assets) => {
+			setAssets(Array.from(assets))
+		})
 	}, [])
 
-	useEffect(() => {
-		if(!play) {
-			audio?.playAsync();
-			setPlay(true)
-		} else {
-			audio?.pauseAsync();
-			setPlay(false)
-		}
-	}, [play]);
+	// useEffect(() => {
+	// 	if(!play) {
+	// 		audio?.playAsync();
+	// 		setPlay(true)
+	// 	} else {
+	// 		audio?.pauseAsync();
+	// 		setPlay(false)
+	// 	}
+	// }, [play, setPlay]);
 
 	useEffect(() => {
 		if(dataPlaybackInfo?.durationMillis) {
@@ -39,6 +49,7 @@ export default function AudioPage() {
 			}, dataPlaybackInfo.durationMillis * 0.1)
 		}
 	}, [dataPlaybackInfo?.durationMillis])
+
 
 	const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
 		if (!status.isLoaded) {
@@ -57,8 +68,8 @@ export default function AudioPage() {
 
 	async function playRandomAudio() {
 		try {
-			const randomIndex = Math.floor(Math.random() * WhatsappAudios.size);
-			const randomAudioAsset = Array.from(WhatsappAudios)[randomIndex];
+			const randomIndex = Math.floor(Math.random() * assets.length);
+			const randomAudioAsset = assets[randomIndex];
 			
 			const newAudio = new Audio.Sound();
 			setAudio(newAudio);
@@ -67,7 +78,6 @@ export default function AudioPage() {
 			newAudio.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate)
 			await newAudio.playAsync();
 			
-			console.log({dataPlaybackInfo})
 			setAudioAsset(randomAudioAsset);
 
 		} catch (error) {
@@ -85,7 +95,6 @@ export default function AudioPage() {
 		}
 	}
 
-	console.log({dataPlaybackInfo})
 
 
 	return (
@@ -100,18 +109,13 @@ export default function AudioPage() {
 					</Text>
 				</Pressable> }
 				
-				{/* TODO: Cambiar este boton por 2 botones de selección de accion (play y abort) */}
 				{audioAsset && <TouchableHighlight >
 					<View className='bg-white shadow-xl m-2 rounded-xl flex justify-center items-center pl-[3px] aspect-square self-center'>
 						<Ionicons name={play ? "play" : "pause"} size={60} color={color as string} onPress={handleAudioPlayback} /> 
 					</View>
 				</TouchableHighlight>}
 
-
-				{dataPlaybackInfo && <View className='h-1 bg-white m-2 rounded-full'>
-					<View className='h-full' style={{backgroundColor: `${color}5f`, width: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%`}}/>
-					<View className='absolute h-3 aspect-square rounded-full bg-white -top-1 -left-1' style={{left: `${dataPlaybackInfo?.positionMillis!/dataPlaybackInfo?.durationMillis!*100}%` }}/> 
-				</View> }
+				{dataPlaybackInfo && <AudioPlayer color={color as string} dataPlaybackInfo={dataPlaybackInfo} />}
 			</View>
 		</SafeAreaView>
 	)
